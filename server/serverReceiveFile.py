@@ -14,6 +14,7 @@ while True:
 
     chunk = clientSocket.recv(CHUNK_SIZE)
     while chunk:
+        print(chunk);
         newFile.write(chunk)
         chunk = clientSocket.recv(CHUNK_SIZE)
 
