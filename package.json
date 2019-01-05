@@ -1,0 +1,28 @@
+{
+  "name": "apollo",
+  "version": "0.0.1",
+  "description": "",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zardini123/PersonalSpotify.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/zardini123/PersonalSpotify/issues"
+  },
+  "homepage": "https://github.com/zardini123/PersonalSpotify#readme",
+  "devDependencies": {
+    "electron": "^4.0.1"
+  },
+  "dependencies": {
+    "bindings": "^1.3.1",
+    "nan": "^2.12.1",
+    "node-gyp": "^3.8.0"
+  }
+}

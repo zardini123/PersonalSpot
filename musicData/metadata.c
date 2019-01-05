@@ -5,6 +5,7 @@
 
 #include <stdio.h>
 
+// -lavformat
 #include <libavformat/avformat.h>
 #include <libavutil/dict.h>
 

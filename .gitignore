@@ -1,0 +1,9 @@
+# Gitignore for Electron application development
+# Directories
+bower_components
+node_modules
+dist
+
+# Files
+*.tgz
+*.log
