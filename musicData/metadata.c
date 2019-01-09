@@ -1,3 +1,5 @@
+// python3 setup.py build_ext --inplace -l avformat
+
 #include <Python.h>
 
 //#include "metadata.h"
@@ -33,6 +35,7 @@ PyObject *getMetadata(PyObject* self, PyObject *args) {
   //    if not, abandon.
   if ((ret = avformat_find_stream_info(fmt_ctx, NULL))) {
       fprintf(stderr, "Cannot find stream information\n");
+      avformat_close_input(&fmt_ctx);
       return PyLong_FromLong(ret);
   }
 
@@ -54,6 +57,7 @@ PyObject *getMetadata(PyObject* self, PyObject *args) {
   // https://docs.python.org/3.7/c-api/concrete.html
   PyObject *metaDict = PyDict_New();
   if (metaDict == NULL) {
+    avformat_close_input(&fmt_ctx);
     return PyLong_FromLong(-1);
   }
 
@@ -63,6 +67,7 @@ PyObject *getMetadata(PyObject* self, PyObject *args) {
     ret = PyDict_SetItem(metaDict, Py_BuildValue("s", tag->key), Py_BuildValue("s", tag->value));
     if (ret < 0) {
       fprintf(stderr, "Error setting dict items\n");
+      avformat_close_input(&fmt_ctx);
       return PyLong_FromLong(ret);
     }
   }
