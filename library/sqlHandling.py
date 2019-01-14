@@ -5,7 +5,7 @@ def dbConnect(db_file):
         conn = sqlite3.connect(db_file)
         return conn
     except Error as e:
-        print(e)
+        print("DB Connection Error:\n", "DB: ", db_file, "\n", e)
 
     return None
 
@@ -16,4 +16,7 @@ def execute(cursor, sql, parameters = None):
         else:
             cursor.execute(sql, parameters)
     except sqlite3.Error as e:
-        print(e)
+        print("DB Execute Error:\n", "SQL: ", sql, "\n", e)
+        return True
+
+    return False

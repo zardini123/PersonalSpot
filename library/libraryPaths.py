@@ -4,8 +4,13 @@ from sqlHandling import dbConnect, execute
 import urllib.parse as urlparse
 import urllib.request as urllib
 
-import os
 import re
+
+import os
+import platform
+
+import hashlib
+import uuid
 
 illegalNames = ["CON", "PRN", "AUX", "NUL",
     "COM1", "COM2", "COM3", "COM4", "COM5", "COM6", "COM7", "COM8", "COM9",
@@ -56,80 +61,160 @@ def filterString(string):
 def path2url(path):
     return urlparse.urljoin('file:', urllib.pathname2url(path))
 
+def sha1Hash(file):
+    h  = hashlib.sha1()
+    b  = bytearray(128*1024)
+    mv = memoryview(b)
+    with open(file, 'rb', buffering=0) as f:
+        for n in iter(lambda : f.readinto(mv), 0):
+            h.update(mv[:n])
+    return h.hexdigest()
+
+def creationTime(path_to_file):
+    """
+    Try to get the date that a file was created, falling back to when it was
+    last modified if that isn't possible.
+    See http://stackoverflow.com/a/39501288/1709587 for explanation.
+    """
+    if platform.system() == 'Windows':
+        return os.path.getctime(path_to_file)
+    else:
+        stat = os.stat(path_to_file)
+        try:
+            return stat.st_birthtime
+        except AttributeError:
+            # We're probably on Linux. No easy way to get creation dates here,
+            # so we'll settle for when its content was last modified.
+            return stat.st_mtime
+
+# Improve SQLite speed:
+# https://stackoverflow.com/questions/1711631/improve-insert-per-second-performance-of-sqlite?rq=1
 dbPath = os.path.join(apolloPath, "apollo.db")
 conn = dbConnect(dbPath)
 c = conn.cursor()
-#if conn is not None:
-if False:
-    trackTable = """CREATE TABLE IF NOT EXISTS track(
-                       uid INTEGER PRIMARY KEY,
-                       location text,
-                       mtime real,
-                       ctime real,
-                       atime real,
-                       hash blob,
-                       artist text,
-                       album text,
-                       name text,
-                       fileArtist text,
-                       fileAlbum text,
-                       fileName text
-                   );"""
+if conn is not None:
+    trackTable = """CREATE TABLE IF NOT EXISTS tracks(
+        hash blob PRIMARY KEY,
+        location text,
+        filename text,
+        title text,
+        artist text,
+        album text,
+        niceTitle text,
+        niceArtist text,
+        niceAlbum text,
+        modifiedTime real,
+        creationTime real
+    );"""
+    # idTable = """CREATE TABLE IF NOT EXISTS ids(
+    #     uid text PRIMARY KEY,
+    #     hash blob,
+    #     location text,
+    #     FOREIGN KEY (hash) REFERENCES tracks(hash)
+    #         ON UPDATE SET NULL
+    # );"""
+    invalidFiles = """CREATE TABLE IF NOT EXISTS invalidFiles(
+        location text PRIMARY KEY,
+        mtime real,
+        ctime real
+    );"""
+    if execute(c, trackTable) or execute(c, invalidFiles):
+        exit()
 
-    execute(c, musicTable)
+    for root, dirs, files in os.walk(musicLibraryURL):
+        for name in files:
+            fullPath = os.path.join(root, name)
+            metadata = musicData.getMetadata(fullPath)
 
+            stats = os.stat(fullPath)
+            #print(type(stats.st_ctime))
 
-for root, dirs, files in os.walk(musicLibraryURL):
-    for name in files:
-        fullPath = os.path.join(root, name)
-        metadata = musicData.getMetadata(fullPath)
+            #url = path2url(fullPath)
+            #print(url)
 
-        stats = os.stat(fullPath)
-        #print(type(stats.st_ctime))
+            if type(metadata) is dict:
+                uid = uuid.uuid4().hex
 
-        url = path2url(fullPath)
-        print(url)
+                hash = sha1Hash(fullPath)
 
-        if type(metadata) is dict:
-            relPath = os.path.relpath(fullPath, musicLibraryURL)
+                relPath = os.path.relpath(fullPath, musicLibraryURL)
+                relPathUrl = urllib.pathname2url(relPath)
 
-            artistFile = artist = ""
-            if 'album_artist' in metadata:
-                artist = metadata['album_artist']
+                if execute(c, "SELECT hash, location FROM tracks WHERE hash=?", (hash,)):
+                    exit()
+                matchingHashes = c.fetchall()
+                if len(matchingHashes) > 0:
+                    ####################
+                    # DUPLICATE TRACKS
+                    print("Duplicate track", name, "exists")
+                    continue;
+
+                # if execute(c, "INSERT INTO ids(uid, hash, location) VALUES(?,?,?)", (uid, hash, relPathUrl)):
+                #     exit()
+
+                # TODO:  Metadata is case-insensitive
+                niceArtist = artist = ""
+                if 'album_artist' in metadata:
+                    artist = metadata['album_artist']
+                else:
+                    if 'artist' in metadata:
+                        artist = metadata['artist']
+
+                #print(artist)
+                niceArtist = filterString(artist)
+                if niceArtist == "":
+                    niceArtist = "Unknown Artist"
+                #print(artist)
+
+                artistPath = os.path.join(apolloPath, niceArtist)
+
+                if ('compilation' in metadata) and (metadata['compilation'] == '1'):
+                    #if (not collectionExists) and (not makeDir(collectionPath)):
+                    #    collectionExists = True
+                    artistPath = collectionPath
+                #else:
+                    #makeDir(artistPath)
+
+                niceAlbum = album = ""
+                if 'album' in metadata:
+                    album = metadata['album']
+
+                niceAlbum = filterString(album)
+                if niceAlbum == "":
+                    niceAlbum = "Unknown Album"
+
+                albumPath = os.path.join(artistPath, niceAlbum)
+
+                niceTitle = title = ""
+                if 'title' in metadata:
+                    title = metadata['title']
+
+                filename, fileExt = os.path.splitext(name)
+
+                if title == "":
+                    title = filename
+                    niceTitle = filterString(filename)
+                #if niceTitle
+
+                #makeDir(albumPath)
+
+                # TODO:  Adjust niceTitle to be unique if duplicate
+
+                mTime = os.path.getmtime(fullPath)
+                cTime = creationTime(fullPath)
+
+                if execute(c, """INSERT INTO tracks(
+                    hash, location, filename, title, artist, album,
+                    niceTitle, niceArtist, niceAlbum,
+                    modifiedTime, creationTime) VALUES(?,?,?,?,?,?,?,?,?,?,?)""",
+                    (hash, relPathUrl, filename, title, artist, album,
+                    niceTitle, niceArtist, niceAlbum, mTime, cTime)):
+                    exit()
+
+                conn.commit()
+                continue;
             else:
-                if 'artist' in metadata:
-                    artist = metadata['artist']
+                continue;
 
-            #print(artist)
-            artistFile = filterString(artist)
-            if artistFile == "":
-                artistFile = "Unknown Artist"
-            #print(artist)
-
-            artistPath = os.path.join(apolloPath, artistFile)
-
-            if ('compilation' in metadata) and (metadata['compilation'] == '1'):
-                #if (not collectionExists) and (not makeDir(collectionPath)):
-                #    collectionExists = True
-                artistPath = collectionPath
-            #else:
-                #makeDir(artistPath)
-
-            albumFile = album = ""
-            if 'album' in metadata:
-                album = metadata['album']
-
-            albumFile = filterString(album)
-            if albumFile == "":
-                albumFile = "Unknown Album"
-
-            albumPath = os.path.join(artistPath, albumFile)
-
-            #makeDir(albumPath)
-
-            filename, fileExt = os.path.splitext(fullPath)
-
-            continue;
-
-conn.commit()
-conn.close()
+    conn.commit()
+    conn.close()
