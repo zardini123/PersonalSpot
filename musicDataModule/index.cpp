@@ -42,23 +42,28 @@ NAN_METHOD(getMetadata) {
     return;
   }
 
-  /*
   AVCodec *dec;
   ret = av_find_best_stream(fmt_ctx, AVMEDIA_TYPE_AUDIO, -1, -1, &dec, 0);
   if (ret < 0) {
+    avformat_close_input(&fmt_ctx);
+    info.GetReturnValue().Set(Nan::New(ret));
     //fprintf(stderr, "Cannot find an audio stream in the input file\n");
     //return PyLong_FromLong(ret);
+    return;
   }
-  //dec->id
-  */
+
+  v8::Local<v8::Object> outJson = Nan::New<v8::Object>();
+  Nan::Set(outJson, Nan::New("codecID").ToLocalChecked(), Nan::New(dec->id));
+  Nan::Set(outJson, Nan::New("codecName").ToLocalChecked(), Nan::New(dec->name).ToLocalChecked());
 
   AVDictionaryEntry *tag = NULL;
-  v8::Local<v8::Object> outJson = Nan::New<v8::Object>();
+  v8::Local<v8::Object> metadataJson = Nan::New<v8::Object>();
 
   while ((tag = av_dict_get(fmt_ctx->metadata, "", tag, AV_DICT_IGNORE_SUFFIX))) {
     //printf("%s=%s\n", tag->key, tag->value);
-    Nan::Set(outJson, Nan::New(tag->key).ToLocalChecked(), Nan::New(tag->value).ToLocalChecked());
+    Nan::Set(metadataJson, Nan::New(tag->key).ToLocalChecked(), Nan::New(tag->value).ToLocalChecked());
   }
+  Nan::Set(outJson, Nan::New("metadata").ToLocalChecked(), metadataJson);
 
   avformat_close_input(&fmt_ctx);
   info.GetReturnValue().Set(outJson);

@@ -1,8 +1,11 @@
-#directories
+.DS_Store
+
+# Electron gitignore
+# Directories
 bower_components
 node_modules
 dist
-#files
+
+# Files
 *.tgz
 *.log
-.DS_Store
