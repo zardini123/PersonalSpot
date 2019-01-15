@@ -49,6 +49,10 @@ app.on('activate', function () {
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.
 
+// Scanning of user's library should eventually be done in a child process.
+// This is to avoid the main and render threads being cloged with other
+// bulky aquisition processes.
+// https://medium.freecodecamp.org/node-js-child-processes-everything-you-need-to-know-e69498fe970a
 const musicLibraryURL = "/Users/Tarasik/Music/iTunes/iTunes Media/Music"
 
 const musicData = require('./build/Release/musicData')

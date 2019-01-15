@@ -7,7 +7,7 @@
         ],
         "libraries": ["-l avformat"],
         "sources": [
-            "musicDataModule/index.cpp"
+            "modules/musicData/index.cpp"
         ]
     }]
 }
