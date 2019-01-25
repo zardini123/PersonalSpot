@@ -1,0 +1,3 @@
+"postinstall": "electron-builder install-app-deps",
+"buildLibraries": "./scripts/buildLibraries.sh",
+"initalizeBoost": "./scripts/initalizeBoost.sh"

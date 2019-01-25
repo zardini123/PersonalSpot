@@ -11,6 +11,38 @@ extern "C" {
   #include <libavutil/dict.h>
 }
 
+// Currently Libc++, which is the C++ standard library on OS X, has not moved
+//    filesystem headers to a sandard location because the specification is
+//    "not stable."
+// https://stackoverflow.com/questions/42633477/macos-clang-c17-filesystem-header-not-found
+#include "boost/filesystem.hpp"
+using namespace boost::filesystem;
+
+NAN_METHOD(listFiles) {
+  // Expect exactly 1 argument
+  if (info.Length() != 1) {
+    return Nan::ThrowError(Nan::New("getMetadata - expected 1 argument").ToLocalChecked());
+  }
+
+  // Expect argument to be a string
+  if (!info[0]->IsString()) {
+    return Nan::ThrowError(Nan::New("getMetadata - expected argument to be a string").ToLocalChecked());
+  }
+
+  std::string v8Path = *Nan::Utf8String(info[0]);
+  const char *url = v8Path.c_str();
+  /*
+  for (auto& p: fs::recursive_directory_iterator(url)) {
+    fprintf(stderr, "%s\n", p.path());
+  }*/
+
+  for (recursive_directory_iterator iter(url), end;
+       iter != end; ++iter) {
+    std::string name = iter->path().filename().string();
+    fprintf(stderr, "%s\n", iter->path().c_str());
+  }
+}
+
 NAN_METHOD(getMetadata) {
   // Expect exactly 1 argument
   if (info.Length() != 1) {
@@ -71,6 +103,7 @@ NAN_METHOD(getMetadata) {
 
 NAN_MODULE_INIT(InitModule) {
   NAN_EXPORT(target, getMetadata);
+  NAN_EXPORT(target, listFiles);
 }
 
 NODE_MODULE(musicData, InitModule);

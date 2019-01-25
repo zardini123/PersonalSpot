@@ -4,9 +4,35 @@
   "description": "",
   "main": "main.js",
   "scripts": {
-    "build": "node-gyp build",
-    "install": "node-gyp rebuild && ./node_modules/.bin/electron-rebuild",
-    "start": "electron ."
+    "install": "node-pre-gyp install --fallback-to-build --build-from-source && ./node_modules/.bin/electron-rebuild",
+    "start": "electron .",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder",
+    "postinstall": "electron-builder install-app-deps"
+  },
+  "binary": {
+    "module_name": "musicData",
+    "module_path": "./src/musicData/module/",
+    "host": "https://your_module.s3-us-west-1.amazonaws.com"
+  },
+  "build": {
+    "files": [
+      "**/*",
+      "!libraries/*",
+      "!build/*",
+      "!scripts/*"
+    ],
+    "mac": {},
+    "win": {},
+    "extraResources": [
+      {
+        "from": "libraries/lib",
+        "to": "Libraries",
+        "filter": [
+          "*.dylib"
+        ]
+      }
+    ]
   },
   "repository": {
     "type": "git",
@@ -20,10 +46,11 @@
   "homepage": "https://github.com/zardini123/PersonalSpotify#readme",
   "devDependencies": {
     "electron": "^4.0.1",
+    "electron-builder": "^20.38.5",
     "electron-rebuild": "^1.8.2"
   },
   "dependencies": {
-    "walk": "^2.3.14",
-    "nan": "^2.7.0"
+    "nan": "^2.7.0",
+    "node-pre-gyp": "^0.12.0"
   }
 }

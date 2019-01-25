@@ -13,7 +13,7 @@ function createWindow () {
   mainWindow.loadFile('index.html')
 
   // Open the DevTools.
-  // mainWindow.webContents.openDevTools()
+  mainWindow.webContents.openDevTools()
 
   // Emitted when the window is closed.
   mainWindow.on('closed', function () {
@@ -55,17 +55,49 @@ app.on('activate', function () {
 // https://medium.freecodecamp.org/node-js-child-processes-everything-you-need-to-know-e69498fe970a
 const musicLibraryURL = "/Users/Tarasik/Music/iTunes/iTunes Media/Music"
 
-const musicData = require('./build/Release/musicData')
+// Unable to link native dependencies/C++ modules to production
+// https://github.com/electron-userland/electron-builder/issues/3455
 
-const walk = require('walk')
-const fs = require('fs')
 const path = require('path')
 
-var walker = walk.walk(musicLibraryURL)
+const process = require('process')
 
+console.log(process.resourcesPath)
+console.log(app.isPackaged)
+
+libraryPath = path.join(process.resourcesPath, "Libraries")
+if (!app.isPackaged) {
+  libraryPath = path.join(app.getAppPath(), "libraries/lib")
+}
+originalCwd = process.cwd()
+
+console.log(`Starting directory: ${originalCwd}`);
+try {
+  process.chdir(libraryPath);
+  console.log(`New directory: ${process.cwd()}`);
+} catch (err) {
+  console.error(`chdir: ${err}`);
+}
+
+var binary = require('node-pre-gyp');
+var binding_path = binary.find(path.resolve(path.join(__dirname,'./package.json')));
+var musicData = require(binding_path);
+
+console.log(`Starting directory: ${process.cwd()}`);
+try {
+  process.chdir(originalCwd);
+  console.log(`New directory: ${process.cwd()}`);
+} catch (err) {
+  console.error(`chdir: ${err}`);
+}
+
+musicData.listFiles(musicLibraryURL)
+
+/*
 walker.on("file", function (root, fileStats, next) {
   var fullPath = path.join(root, fileStats.name)
   console.log(fullPath)
   console.log(musicData.getMetadata(fullPath))
   next();
 });
+*/
