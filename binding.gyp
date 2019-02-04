@@ -3,7 +3,8 @@
         {
             "target_name": "<(module_name)",
             "sources": [
-                "src/<(module_name)/index.cpp"
+                "src/<(module_name)/index.cpp",
+                "src/<(module_name)/musicData.cpp"
             ],
             "include_dirs" : [
                 "libraries/include",
@@ -11,7 +12,8 @@
             ],
             "link_settings": {
                 "libraries": [
-                    "<(module_root_dir)/libraries/lib/libboost_filesystem.dylib"
+                    "<(module_root_dir)/libraries/lib/libboost_filesystem.dylib",
+                    "<(module_root_dir)/libraries/lib/libsqlite3.dylib"
                 ]
             },
             "libraries": [

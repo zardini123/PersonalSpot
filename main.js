@@ -1,5 +1,35 @@
 // Modules to control application life and create native browser window
-const {app, BrowserWindow} = require('electron')
+const electron = require('electron')
+const {app, BrowserWindow} = electron
+
+const musicData = require('./src/musicData/importMusicData')
+musicData.setup(app.getPath('music'))
+
+app.quit()
+
+const storage = require('electron-json-storage');
+class Settings {
+  constructor() {
+    let val;
+    storage.get('settings', (error, val) => {
+      if (error) throw error;
+    });
+
+    this._data = val;
+  }
+
+  get data() {
+    return this._data;
+  }
+
+  set data(newData) {
+    storage.set('settings', newData, function(error) {
+      if (error) throw error;
+    });
+    this._data = newData;
+  }
+}
+var settings = new Settings()
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -7,13 +37,24 @@ let mainWindow
 
 function createWindow () {
   // Create the browser window.
-  mainWindow = new BrowserWindow({width: 800, height: 600})
+  // mainWindow = new BrowserWindow({width: 800, height: 600})
+  const { width, height } = electron.screen.getPrimaryDisplay().workAreaSize
+
+  let finalWidth = width * 0.8
+  let size = {width: finalWidth, height: height}
+  if (settings.data['size'] == null) {
+    settings.data['size'] = size
+  } else {
+    size = settings.data['size']
+  }
+
+  mainWindow = new BrowserWindow({width: size['width'], height: size['height']})
 
   // and load the index.html of the app.
   mainWindow.loadFile('index.html')
 
   // Open the DevTools.
-  mainWindow.webContents.openDevTools()
+  // mainWindow.webContents.openDevTools()
 
   // Emitted when the window is closed.
   mainWindow.on('closed', function () {
@@ -24,10 +65,37 @@ function createWindow () {
   })
 }
 
+// const storage = require('electron-json-storage');
+const sqlite3 = require('sqlite3').verbose();
+const path = require('path');
+const fs = require('fs');
+
+function setup() {
+  rootPath = path.join(app.getPath('music'), "Apollo");
+  if (!fs.existsSync(rootPath)) {
+    fs.mkdir(rootPath, (err) => {
+      if (err) throw err;
+    });
+  }
+
+  let db = new sqlite3.Database(path.join(rootPath, "apollo.db"), (err) => {
+    if (err) {
+      return console.error(err.message);
+    }
+    //console.log('Connected to the Apollo database');
+  });
+
+  db.close();
+
+  if (settings.data == null) settings.data = {};
+
+  createWindow();
+}
+
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
-app.on('ready', createWindow)
+app.on('ready', setup)
 
 // Quit when all windows are closed.
 app.on('window-all-closed', function () {
@@ -46,58 +114,22 @@ app.on('activate', function () {
   }
 })
 
+const {ipcMain, dialog}	= require('electron'); // include the ipc module to communicate with render process ie to receive the message from render process
+
+//ipcMain.on will receive the “btnclick” info from renderprocess
+ipcMain.on("btnclick",function (event, arg) {
+  console.log("ayy");
+
+  dir = dialog.showOpenDialog(null, {
+    title: "Select folder where Apollo's main database folder will be stored",
+    message: "Select folder where Apollo's main database folder will be stored",
+    defaultPath: app.getPath('music'),
+    properties: [
+      'openDirectory',
+      'createDirectory',
+      'promptToCreate'
+    ]
+  });
+});
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.
-
-// Scanning of user's library should eventually be done in a child process.
-// This is to avoid the main and render threads being cloged with other
-// bulky aquisition processes.
-// https://medium.freecodecamp.org/node-js-child-processes-everything-you-need-to-know-e69498fe970a
-const musicLibraryURL = "/Users/Tarasik/Music/iTunes/iTunes Media/Music"
-
-// Unable to link native dependencies/C++ modules to production
-// https://github.com/electron-userland/electron-builder/issues/3455
-
-const path = require('path')
-
-const process = require('process')
-
-console.log(process.resourcesPath)
-console.log(app.isPackaged)
-
-libraryPath = path.join(process.resourcesPath, "Libraries")
-if (!app.isPackaged) {
-  libraryPath = path.join(app.getAppPath(), "libraries/lib")
-}
-originalCwd = process.cwd()
-
-console.log(`Starting directory: ${originalCwd}`);
-try {
-  process.chdir(libraryPath);
-  console.log(`New directory: ${process.cwd()}`);
-} catch (err) {
-  console.error(`chdir: ${err}`);
-}
-
-var binary = require('node-pre-gyp');
-var binding_path = binary.find(path.resolve(path.join(__dirname,'./package.json')));
-var musicData = require(binding_path);
-
-console.log(`Starting directory: ${process.cwd()}`);
-try {
-  process.chdir(originalCwd);
-  console.log(`New directory: ${process.cwd()}`);
-} catch (err) {
-  console.error(`chdir: ${err}`);
-}
-
-musicData.listFiles(musicLibraryURL)
-
-/*
-walker.on("file", function (root, fileStats, next) {
-  var fullPath = path.join(root, fileStats.name)
-  console.log(fullPath)
-  console.log(musicData.getMetadata(fullPath))
-  next();
-});
-*/
