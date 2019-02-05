@@ -1,0 +1,22 @@
+/* Default variables */
+/* :root {
+  --blue-color: blue;
+  --green-color: green;
+} */
+
+[data-theme^="light"],
+[data-theme] [data-theme^="light"] {
+  --background-color: #ffffff;
+  --text-color: #000000;
+}
+
+[data-theme^="dark"],
+[data-theme] [data-theme^="dark"] {
+  --background-color: #161616;
+  --text-color: #EBEBEB;
+}
+
+body {
+  background-color: var(--background-color);
+  color: var(--text-color);
+}

@@ -2,10 +2,10 @@
 const electron = require('electron')
 const {app, BrowserWindow} = electron
 
-const musicData = require('./src/musicData/importMusicData')
-musicData.setup(app.getPath('music'))
-
-app.quit()
+// const musicData = require('./src/musicData/importMusicData')
+// musicData.setup(app.getPath('music'))
+//
+// app.quit()
 
 const storage = require('electron-json-storage');
 class Settings {
@@ -51,10 +51,10 @@ function createWindow () {
   mainWindow = new BrowserWindow({width: size['width'], height: size['height']})
 
   // and load the index.html of the app.
-  mainWindow.loadFile('index.html')
+  mainWindow.loadFile('./src/index.html')
 
   // Open the DevTools.
-  // mainWindow.webContents.openDevTools()
+  mainWindow.webContents.openDevTools()
 
   // Emitted when the window is closed.
   mainWindow.on('closed', function () {
@@ -71,22 +71,6 @@ const path = require('path');
 const fs = require('fs');
 
 function setup() {
-  rootPath = path.join(app.getPath('music'), "Apollo");
-  if (!fs.existsSync(rootPath)) {
-    fs.mkdir(rootPath, (err) => {
-      if (err) throw err;
-    });
-  }
-
-  let db = new sqlite3.Database(path.join(rootPath, "apollo.db"), (err) => {
-    if (err) {
-      return console.error(err.message);
-    }
-    //console.log('Connected to the Apollo database');
-  });
-
-  db.close();
-
   if (settings.data == null) settings.data = {};
 
   createWindow();
@@ -113,23 +97,5 @@ app.on('activate', function () {
     createWindow()
   }
 })
-
-const {ipcMain, dialog}	= require('electron'); // include the ipc module to communicate with render process ie to receive the message from render process
-
-//ipcMain.on will receive the “btnclick” info from renderprocess
-ipcMain.on("btnclick",function (event, arg) {
-  console.log("ayy");
-
-  dir = dialog.showOpenDialog(null, {
-    title: "Select folder where Apollo's main database folder will be stored",
-    message: "Select folder where Apollo's main database folder will be stored",
-    defaultPath: app.getPath('music'),
-    properties: [
-      'openDirectory',
-      'createDirectory',
-      'promptToCreate'
-    ]
-  });
-});
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.

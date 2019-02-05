@@ -1,6 +1,21 @@
 <!DOCTYPE html>
 <html>
+  <link rel="stylesheet" href="main.css">
+
   <head>
+    <script>
+      window.__setTheme = () => {
+        let userTheme = localStorage.user_theme
+        let OSTheme = localStorage.os_theme
+        let defaultTheme = 'light'
+        document.documentElement.setAttribute(
+          'data-theme',
+          userTheme || OSTheme || defaultTheme,
+        )
+      }
+      __setTheme()
+    </script>
+
     <meta charset="UTF-8">
     <title>Hello World!</title>
   </head>

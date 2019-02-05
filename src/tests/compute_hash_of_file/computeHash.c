@@ -25,12 +25,13 @@ int main() {
   const char *url = "/Users/Tarasik/Music/iTunes/iTunes Media/Music/RADWIMPS/Kimi no Na wa. Original Soundtrack/01 Yumetourou.mp3";
   FILE *fp = fopen(url, "rb");
 
-  unsigned char buffer[17];
+  int bufferSize = 65535;
+  unsigned char buffer[bufferSize + 1];
 
   av_hash_init(hash);
   if (fp != NULL) {
     int read = 0;
-    while((read = fread(buffer, 1, 16, fp)) > 0) {
+    while((read = fread(buffer, 1, bufferSize, fp)) > 0) {
       av_hash_update(hash, buffer, read);
     }
     fclose(fp);
