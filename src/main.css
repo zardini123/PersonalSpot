@@ -4,6 +4,11 @@
   --green-color: green;
 } */
 
+* {
+  margin: 0;
+  padding: 0;
+}
+
 [data-theme^="light"],
 [data-theme] [data-theme^="light"] {
   --background-color: #ffffff;
@@ -19,4 +24,9 @@
 body {
   background-color: var(--background-color);
   color: var(--text-color);
+}
+
+#album_art {
+  width: 15%;
+  padding: 15px;
 }

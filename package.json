@@ -22,7 +22,11 @@
       "!build/*",
       "!scripts/*"
     ],
-    "mac": {},
+    "mac": {
+      "electronLanguages": [
+        "en"
+      ]
+    },
     "win": {},
     "extraResources": [
       {
