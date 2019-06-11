@@ -1,7 +1,5 @@
 .DS_Store
 
-libraries/*
-
 # node-gyp gitignore
 build
 
@@ -11,7 +9,7 @@ bin
 # electron-builder gitignore
 dist
 
-### Electron gitignore
+### node/electron gitignore
 # Directories
 bower_components
 node_modules

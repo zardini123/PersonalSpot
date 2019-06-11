@@ -1,0 +1,5 @@
+1. Project Structure Practices
+
+  1.1 Structure your solution by components
+    Good: Structure your solution by self-contained components
+    Bad: Group your files by technical role
