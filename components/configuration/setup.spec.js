@@ -1,12 +1,36 @@
-const path = require('path');
+const yaml = require('js-yaml');
 const fs = require('fs');
-const util = require('util');
 
-// Convert fs.readFile into Promise version of same
-const readFile = util.promisify(fs.readFile);
+const chai = require('chai');
+const should = chai.should();
+
+const setup = require('./setup.js');
 
 describe('configuration', function() {
+  describe('inital configuration file', function() {
+    it('should return a valid YAML object', function() {
+      // Get document, or throw exception on error
+      try {
+        const file = fs.readFileSync(
+            './components/configuration/initalConfig.yml',
+            'utf8'
+        );
+        yaml.safeLoad(file);
+      } catch (e) {
+        should.fail(e);
+      }
+    });
+  });
   describe('configuration setup', function() {
-    it.skip('should create a basic config file in current directory', function() {});
+    it('should create inital config file in current directory', function() {
+      setup
+          .createConfigFile()
+          .then(() => {
+            throw new Error('owo');
+          })
+          .catch((err) => {
+            should.fail(err);
+          });
+    });
   });
 });

@@ -37,7 +37,6 @@
     "express-session": "^1.16.1",
     "helmet": "^3.18.0",
     "js-yaml": "^3.13.1",
-    "json5": "^2.1.0",
     "permit": "^0.2.4",
     "private-parts": "^0.4.1"
   }

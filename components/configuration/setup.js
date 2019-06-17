@@ -1,4 +1,9 @@
-const initalConfig = require('./initalConfig.js');
+const path = require('path');
+const fs = require('fs');
+
+const {promisify} = require('util');
+const writeFile = promisify(fs.writeFile);
+const readFile = promisify(fs.readFile);
 
 function checkIfSetup() {
   // Check if config file exists
@@ -7,7 +12,7 @@ function checkIfSetup() {
   //    Return "please setup config"
   //    Shutdown
   // If file does exist:
-  //    Check if valid json
+  //    Check if valid yaml
   //    Check for valid repo path
   //    Check if repository directories exist
   //    If not:
@@ -25,4 +30,11 @@ function checkIfSetup() {
   //      Set database version number
   //    Log and shutdown if any failures
   // Start server (continue app.js sequence)
+}
+
+function createConfigFile() {
+  return new Promise(async (resolve, reject) => {
+    const content = await readFile('./initalConfig.yml', 'utf-8');
+    await writeFile(path.join(process.cwd(), 'config.yml'), content);
+  });
 }
