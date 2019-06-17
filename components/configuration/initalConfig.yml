@@ -1,0 +1,27 @@
+# Configuration items needed:
+#   Repository port
+#   Setting repository path
+#   (Setting logging path)
+#   Authentication stuff:
+#     - Disable user Authentication
+#     - Enable "login as guest"
+#       > Having both enabled should default to a very low-level role ("Default") for all
+#   Roles/Permisisons concepts:
+#     - Admin role
+#       > View and manage jobs, requests, and system loggings (error and debug)
+#       > Edit and manitain metadata without going through requests
+#     - Guest role
+#       > Only can view/listen to music.  No server editing whatsoever
+#             (how can this be secured?).
+#     - Default role
+#       > Things to notifiy server admin/setup-er:
+#         ~ Permissions must be kept low-level to not risk unwarrented server greifing
+#         ~ This role is the only applied role if both "Disable user auth" and
+#               "Enable login as guest" is enabled
+#   Future:
+#     Multiple routings with specialized parameters
+#       - Have only certain songs be accessible via that routing
+#       - Have certain permissions (user auth requ, or none)
+#     Multiple repositories (why would it be useful?)
+#       - Physically seperate certain songs in different locations in file-system
+#         > Can be nice in a multiple drive scenario
