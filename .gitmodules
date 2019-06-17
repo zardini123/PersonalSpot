@@ -1,0 +1,6 @@
+[submodule "libraries/repositories/c++/boost"]
+	path = libraries/repositories/c++/boost
+	url = https://github.com/boostorg/boost.git
+[submodule "libraries/repositories/c/FFmpeg"]
+	path = libraries/repositories/c/FFmpeg
+	url = https://github.com/FFmpeg/FFmpeg.git

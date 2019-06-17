@@ -1,0 +1,19 @@
+.DS_Store
+
+# node-gyp gitignore
+build
+
+# electron-rebuild gitignore
+bin
+
+# electron-builder gitignore
+dist
+
+### node/electron gitignore
+# Directories
+bower_components
+node_modules
+
+# Files
+*.tgz
+*.log
