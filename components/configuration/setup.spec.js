@@ -3,6 +3,7 @@ const fs = require('fs');
 
 const chai = require('chai');
 const should = chai.should();
+const expect = chai.expect();
 
 const setup = require('./setup.js');
 
@@ -22,15 +23,21 @@ describe('configuration', function() {
     });
   });
   describe('configuration setup', function() {
-    it('should create inital config file in current directory', function() {
+    it('should create inital config file in current directory', function(done) {
       setup
-          .createConfigFile()
+          .createConfigFile('testConfig.yml')
           .then(() => {
-            throw new Error('owo');
+            done();
           })
           .catch((err) => {
             should.fail(err);
           });
+    });
+    describe('validateConfigFile()', function() {
+      it.skip('expect to fail upon verifying a non-YAML file', function() {
+        // expect(setup.validateConfigFile('package.json')).to.fail;
+      });
+      it.skip('should determine created config file is a valid YAML file', function(done) {});
     });
   });
 });

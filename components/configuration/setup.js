@@ -1,3 +1,5 @@
+const yaml = require('js-yaml');
+
 const path = require('path');
 const fs = require('fs');
 
@@ -32,9 +34,28 @@ function checkIfSetup() {
   // Start server (continue app.js sequence)
 }
 
-function createConfigFile() {
+module.exports.validateConfigFile = function validateConfigFile(name) {
+  if (!name) name = 'config.yml';
+  yaml.safeLoad(fs.readFile(path.join(process.cwd(), name)));
+};
+
+module.exports.createConfigFile = function createConfigFile(name) {
   return new Promise(async (resolve, reject) => {
-    const content = await readFile('./initalConfig.yml', 'utf-8');
-    await writeFile(path.join(process.cwd(), 'config.yml'), content);
+    try {
+      if (!name) name = 'config.yml';
+
+      const content = await readFile(
+          path.join(__dirname, 'initalConfig.yml'),
+          'utf-8'
+      );
+      // Have a call of safeLoad here to ensure the contents of the inital
+      //    configuration hasn't been tampered with too bad.
+      yaml.safeLoad(content);
+      await writeFile(path.join(process.cwd(), name), content);
+      await readFile(path.join(process.cwd(), name));
+      resolve();
+    } catch (err) {
+      reject(err);
+    }
   });
-}
+};
