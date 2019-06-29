@@ -1,3 +1,8 @@
+// print process.argv
+process.argv.forEach(function(val, index, array) {
+  console.log(index + ': ' + val);
+});
+
 const express = require('express');
 const helmet = require('helmet');
 
