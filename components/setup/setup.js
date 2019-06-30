@@ -27,15 +27,16 @@ function setupProcedure() {
       let info = stmt.run();
       // Check if repo version number exists
       stmt = db.prepare('SELECT key, value FROM meta_info WHERE key=?;');
-      let dbVersion = stmt.get('database_version');
-      if (dbVersion == null) {
+      const out = stmt.get('database_version');
+      let dbVersion = '';
+      if (out == null) {
         stmt = db.prepare('INSERT INTO meta_info (key, value) VALUES(?, ?)');
         // TODO: Get database version ID from the "database" component
-        info = stmt.run('database_version', '0.0.1');
+        dbVersion = '0.0.1';
+        info = stmt.run('database_version', dbVersion);
+      } else {
+        dbVersion = out.value;
       }
-
-      stmt = db.prepare('SELECT key, value FROM meta_info WHERE key=?;');
-      dbVersion = stmt.get('database_version');
       console.log(dbVersion);
       // If exists:
       //    Get repo version number
