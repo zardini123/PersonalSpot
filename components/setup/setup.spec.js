@@ -35,7 +35,7 @@ describe('configuration', function() {
     // });
 
     describe('setupProcedure()', function() {
-      before(async () => {
+      before(function() {
         tempDir = tmp.dirSync({unsafeCleanup: true});
 
         process.env.REPO_DIR = tempDir.name;
@@ -49,15 +49,11 @@ describe('configuration', function() {
         it('function should not throw any uncaught errors', function(done) {
           setup
               .setupProcedure()
-              .then(() => {
-                done();
-              })
-              .catch((err) => {
-                done(err);
-              });
+              .then(() => done())
+              .catch((err) => done(err));
         });
       });
-      after(async () => {
+      after(function() {
         // Manual cleanup of temporary directory
         tempDir.removeCallback();
       });

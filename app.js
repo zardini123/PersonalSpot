@@ -1,25 +1,15 @@
-// print process.argv
-process.argv.forEach(function(val, index, array) {
-  console.log(index + ': ' + val);
-});
-
 const express = require('express');
 const helmet = require('helmet');
 
+const path = require('path');
+const config = require(path.resolve('.', 'components', 'config'));
+
 const app = express();
 app.use(helmet());
-
-const port = 3000;
-
-const errorManagement = require('./components/errorManagement')('./out.log');
-require('./components/listeners')();
-
-const bunyan = require('bunyan');
-
-throw new Error();
 
 app.get('/', function(req, res) {
   res.sendFile('index.html', {root: __dirname});
 });
 
+const port = config.getPort();
 app.listen(port, () => console.log(`Example app listening on port ${port}!`));

@@ -39,7 +39,7 @@ describe('listeners', function() {
       proc.on('exit', function(code) {
         expect(code).to.equal(1);
 
-        // BAD BAD BAD
+        // FIXME: BAD BAD BAD
         expect(output).to.contain('uncaughtException');
 
         // const outData = fs.readFileSync('./out.log');
