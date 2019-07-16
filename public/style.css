@@ -5,13 +5,16 @@
 .imageContainer {
   margin: 0;
   padding: 0;
-  display: flex;
+  display: inline-flex;
   justify-content: center;
   align-items: flex-end;
-  width: 420px;
-  height: 420px;
+  width: 200px;
+  height: 200px;
 }
 .image {
   max-height: 100%;
   max-width: 100%;
+}
+.images {
+  line-height: 0;
 }
