@@ -48,4 +48,12 @@ app.get('/images', (req, res) => {
   return res.send(arr);
 });
 
+// app.post('/api/albums', function(req, res) {
+//   const user_id = req.body.id;
+//   const token = req.body.token;
+//   const geo = req.body.geo;
+//
+//   res.send(user_id + ' ' + token + ' ' + geo);
+// });
+
 app.listen(port, () => console.log(`Example app listening on port ${port}!`));

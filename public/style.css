@@ -1,20 +1,28 @@
+:root {
+  --cover-container-size: 100px;
+  --cover-container-margin: 22px;
+}
+
 * {
   margin: 0;
   padding: 0;
 }
 .imageContainer {
   margin: 0;
+  margin-right: var(--cover-container-margin);
   padding: 0;
   display: inline-flex;
   justify-content: center;
   align-items: flex-end;
-  width: 200px;
-  height: 200px;
+  width: var(--cover-container-size);
+  height: var(--cover-container-size);
+  border: 1px solid black;
 }
 .image {
   max-height: 100%;
   max-width: 100%;
 }
-.images {
+.contentViewport {
   line-height: 0;
+  width: 100%;
 }
