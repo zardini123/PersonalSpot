@@ -9,11 +9,24 @@
     <title>PersonalSpot UI</title>
   </head>
   <body>
-    <h1>This is a heading</h1>
-    <p>This is a paragraph.</p>
-    <a href="https://github.com/zardini123/PersonalSpot">
-      Link to github page
-    </a>
-    <p>Album art grid test:</p>
+    <input
+      id="view_slider"
+      class="range blue"
+      type="range"
+      min="0"
+      value="2000"
+      max="3000"
+      step="1"
+      list="ticks"
+      oninput="sliderInput(this.value)"
+      onchange="sliderChange(this.value)"
+    />
+    <datalist id="ticks">
+      <option>0</option>
+      <option>1000</option>
+      <option>2000</option>
+      <option>3000</option>
+    </datalist>
     <div class="contentViewport"></div>
+  </body>
 </html>

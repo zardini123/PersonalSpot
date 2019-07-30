@@ -8,6 +8,17 @@ function getRandomInt(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
+function makeid(length) {
+  let result = '';
+  const characters =
+    'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  const charactersLength = characters.length;
+  for (let i = 0; i < length; i++) {
+    result += characters.charAt(Math.floor(Math.random() * charactersLength));
+  }
+  return result;
+}
+
 const path = require('path');
 
 app.use(express.static('public'));
@@ -39,11 +50,19 @@ app.get('/images', (req, res) => {
   const arr = [];
   // Small image test.  This image should be scaled to the size of the container
   // FIXME:  Images smaller than container does not scale
-  arr.push('https://via.placeholder.com/50x50.png');
+  arr.push({
+    coverURL: 'https://via.placeholder.com/50x50.png',
+    albumName: '50x50',
+    artistName: makeid(40),
+  });
   for (let i = 0; i < 100; i++) {
     const width = getRandomInt(50, 1000);
     const height = getRandomInt(50, 1000);
-    arr.push('https://via.placeholder.com/' + width + 'x' + height + '.png');
+    arr.push({
+      coverURL: 'https://via.placeholder.com/' + width + 'x' + height + '.png',
+      albumName: width + 'x' + height,
+      artistName: makeid(40),
+    });
   }
   return res.send(arr);
 });
